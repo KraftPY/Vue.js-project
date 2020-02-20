@@ -1,10 +1,15 @@
 <template>
   <div class="mx-7">
+    <div v-if="user" class="d-flex align-center">
+      <span>{{`Hello, ${user.firstName} ${user.lastName}`}}</span>
+      <v-btn @click="logout" class="ml-5" small color="error">Log-out</v-btn>
+    </div>
     <v-menu
       v-model="menuAuth"
       :close-on-content-click="false"
       transition="slide-y-transition"
       offsetY
+      v-else-if="!user"
     >
       <template v-slot:activator="{ on }" class="mb-5">
         <v-btn large v-on="on">
@@ -41,7 +46,8 @@
           </v-row>
           <v-row>
             <v-col cols="12">
-              <v-btn @click="checkAuth" class="float-right">Enter</v-btn>
+              <span v-if="authFailed" class="ml-3 error--text">Authorization failed</span>
+              <v-btn @click="checkAuth" class="float-right" color="success">Enter</v-btn>
             </v-col>
           </v-row>
         </v-container>
@@ -60,6 +66,8 @@ export default {
       email: "",
       password: "",
       show: false,
+      authFailed: false,
+      user: null,
       rules: {
         required: value => !!value || "Required.",
         email: value => {
@@ -70,6 +78,7 @@ export default {
       }
     };
   },
+
   methods: {
     checkAuth() {
       if (
@@ -78,19 +87,31 @@ export default {
         this.rules.required(this.password) == true &&
         this.rules.min(this.password) == true
       ) {
-        console.log(this.email);
-        console.log(this.password);
-
-        this.menuAuth = false;
+        const user =
+          this.$store.getters.checkUser({
+            email: this.email,
+            password: this.password
+          }) || null;
+        if (user) {
+          this.menuAuth = false;
+          this.user = user;
+        } else {
+          this.authFailed = true;
+        }
       }
+    },
+    logout() {
+      this.user = null;
     }
   },
+
   watch: {
     menuAuth(value) {
       if (!value) {
         this.$refs.form.resetValidation();
         this.email = "";
         this.password = "";
+        this.authFailed = false;
       }
     }
   }

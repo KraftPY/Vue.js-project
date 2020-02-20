@@ -1,16 +1,18 @@
 <template>
   <div>
     <v-container>
-      <v-row>
-        <v-col cols="12" sm="6">
+      <v-row justify="center">
+        <v-col cols="12" sm="3">
           <v-text-field
             v-model.trim="valueName"
             label="Customer name"
             class="mx-0 mt-2 pa-0"
             clearable
+            :append-icon="sortName ? 'mdi-sort-descending' :'mdi-sort-ascending'"
+            @click:append="sortName = !sortName"
           ></v-text-field>
         </v-col>
-        <v-col cols="12" sm="6">
+        <v-col cols="12" sm="3">
           <v-select
             v-model="valueRating"
             :items="[1, 2, 3, 4, 5]"
@@ -20,6 +22,8 @@
             multiple
             clearable
             class="ma-0 pa-0"
+            :append-icon="sortRating ? 'mdi-sort-descending' :'mdi-sort-ascending'"
+            @click:append="sortRating = !sortRating"
           ></v-select>
         </v-col>
       </v-row>
@@ -80,7 +84,9 @@ export default {
   data: () => {
     return {
       valueRating: 0,
-      valueName: null
+      valueName: null,
+      sortName: null,
+      sortRating: null
     };
   },
 
@@ -96,15 +102,37 @@ export default {
   computed: {
     filteredCustomers() {
       let customers = this.$store.getters.AllCustomers;
+      // Filter by first name
       if (this.valueName != null) {
         customers = customers.filter(el =>
           el.firstName.toLowerCase().includes(this.valueName.toLowerCase())
         );
       }
+      // Filter by rating
       if (this.valueRating.length) {
         customers = customers.filter(el => {
           return this.valueRating.includes(el.rating);
         });
+      }
+      // Sort by first name
+      if (this.sortName != null && this.sortName == true) {
+        customers.sort((a, b) => {
+          if (a.firstName > b.firstName) return 1;
+          else if (a.firstName < b.firstName) return -1;
+          else return 0;
+        });
+      } else if (this.sortName != null && this.sortName == false) {
+        customers.sort((a, b) => {
+          if (a.firstName > b.firstName) return -1;
+          else if (a.firstName < b.firstName) return 1;
+          else return 0;
+        });
+      }
+      // Sort by rating
+      if (this.sortRating != null && this.sortRating == true) {
+        customers.sort((a, b) => a.rating - b.rating);
+      } else if (this.sortRating != null && this.sortRating == false) {
+        customers.sort((a, b) => b.rating - a.rating);
       }
       return customers;
     }

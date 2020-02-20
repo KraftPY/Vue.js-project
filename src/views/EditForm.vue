@@ -5,51 +5,72 @@
         <v-row justify="center">
           <v-col cols="12" sm="4">
             <div class="d-flex flex-column align-center">
-              <v-img class="mb-4" height="200" width="200" :src="foto"></v-img>
-              <v-rating :value="rating" color="#FFD600" dense half-increments size="20"></v-rating>
+              <v-img class="mb-4" height="200" width="200" :src="customer.foto"></v-img>
+              <v-rating v-model="customer.rating" color="#FFD600" dense half-increments size="20"></v-rating>
             </div>
           </v-col>
           <v-col cols="12" md="4">
             <div>
               <!--------------------- First name --------------------------------------->
               <v-text-field
-                v-model="firstName"
-                :rules="nameRules"
-                :counter="10"
+                v-model="customer.firstName"
+                :rules="[rules.required]"
                 label="First name"
                 required
               ></v-text-field>
               <!--------------------- Last name --------------------------------------->
               <v-text-field
-                v-model="lastName"
-                :rules="nameRules"
-                :counter="10"
+                v-model="customer.lastName"
+                :rules="[rules.required]"
                 label="Last name"
                 required
               ></v-text-field>
               <!--------------------- E-mail name --------------------------------------->
-              <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
+              <v-text-field
+                v-model="customer.email"
+                :rules="[rules.required, rules.email]"
+                label="E-mail"
+                required
+              ></v-text-field>
               <!--------------------- Proffesion name --------------------------------------->
-              <v-text-field v-model="proffesion" :rules="nameRules" label="Proffesion" required></v-text-field>
+              <v-text-field
+                v-model="customer.proffesion"
+                :rules="[rules.required]"
+                label="Proffesion"
+                required
+              ></v-text-field>
               <!--------------------- Birthday name --------------------------------------->
               <v-menu
                 ref="menu"
                 v-model="menu"
                 :close-on-content-click="false"
-                :return-value.sync="birthday"
+                :return-value.sync="customer.birthday"
                 transition="scale-transition"
                 offset-y
                 min-width="290px"
               >
                 <template v-slot:activator="{ on }">
-                  <v-text-field v-model="birthday" label="Picker in menu" readonly v-on="on"></v-text-field>
+                  <v-text-field
+                    v-model="customer.birthday"
+                    label="Picker in menu"
+                    readonly
+                    v-on="on"
+                  ></v-text-field>
                 </template>
-                <v-date-picker v-model="birthday" no-title scrollable>
+                <v-date-picker v-model="customer.birthday" no-title scrollable>
                   <v-spacer></v-spacer>
                   <v-btn text color="primary" @click="menu = false">Cancel</v-btn>
-                  <v-btn text color="primary" @click="$refs.menu.save(birthday)">OK</v-btn>
+                  <v-btn text color="primary" @click="$refs.menu.save(customer.birthday)">OK</v-btn>
                 </v-date-picker>
               </v-menu>
+            </div>
+          </v-col>
+        </v-row>
+        <v-row justify="center">
+          <v-col cols="6" md="4">
+            <div class="d-flex justify-space-between mt-7">
+              <v-btn width="40%" large color="warning" @click="$router.push({ path: '/' })">Close</v-btn>
+              <v-btn width="40%" large color="primary" @click="saveCustomer">Save</v-btn>
             </div>
           </v-col>
         </v-row>
@@ -64,29 +85,45 @@ export default {
 
   data: () => ({
     valid: false,
-    id: "",
-    firstName: "",
-    lastName: "",
-    email: "",
-    birthday: null,
-    proffesion: "",
-    rating: 0,
-    foto: "",
-    nameRules: [v => !!v || "Name is required"],
-    emailRules: [
-      v => !!v || "E-mail is required",
-      v =>
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-          v
-        ) || "E-mail must be valid"
-    ],
+    customer: {
+      id: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      birthday: null,
+      proffesion: "",
+      rating: 0,
+      foto: ""
+    },
+    rules: {
+      required: value => !!value || "Required.",
+      email: value => {
+        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return pattern.test(value) || "Invalid e-mail.";
+      }
+    },
     menu: false
   }),
+
+  methods: {
+    saveCustomer() {
+      const { firstName, lastName, email } = this.customer;
+      if (
+        this.rules.required(firstName) == true &&
+        this.rules.required(lastName) == true &&
+        this.rules.required(email) == true &&
+        this.rules.email(email) == true
+      ) {
+        this.$store.dispatch("editCustomer", this.customer);
+        this.$router.push({ path: "/" });
+      }
+    }
+  },
 
   mounted: function() {
     const customer = this.$store.getters.customerData(this.$route.params.id);
     for (const key in customer) {
-      this[key] = customer[key];
+      this.customer[key] = customer[key];
     }
   }
 };

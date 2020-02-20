@@ -5,7 +5,23 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    customers: []
+    customers: [],
+    users: [
+      {
+        id: 11,
+        email: "admin@site.com",
+        password: "Qaz123",
+        firstName: "Fred",
+        lastName: "Bred"
+      }, {
+        id: 22,
+        email: "root@site.com",
+        password: "root",
+        firstName: "Bred",
+        lastName: "Fred"
+
+      }
+    ]
   },
   mutations: {
     updateCustomers(state, data) {
@@ -13,6 +29,13 @@ export default new Vuex.Store({
     },
     deleteCustomer(state, id) {
       state.customers = state.customers.filter(el => el.id != id);
+    },
+
+    changeCustomerData(state, customer) {
+      const oldData = state.customers.find(el => el.id == customer.id);
+      for (const key in oldData) {
+        oldData[key] != customer[key] ? oldData[key] = customer[key] : false;
+      }
     }
   },
   actions: {
@@ -39,6 +62,10 @@ export default new Vuex.Store({
 
     removeCustomer(ctx, id) {
       ctx.commit("deleteCustomer", id);
+    },
+
+    editCustomer(ctx, customer) {
+      ctx.commit("changeCustomerData", customer);
     }
   },
   getters: {
@@ -50,6 +77,9 @@ export default new Vuex.Store({
     },
     customerData: state => id => {
       return state.customers.find(el => el.id == id);
+    },
+    checkUser: state => user => {
+      return state.users.find(el => (el.email == user.email && el.password == user.password));
     }
   },
   modules: {
