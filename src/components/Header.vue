@@ -2,17 +2,17 @@
   <div>
     <v-app-bar height="100">
       <v-row>
-        <v-col cols="12" sm="6">
+        <v-col cols="12" sm="3">
           <v-toolbar-title>
             <router-link to="/" class="title">Site title</router-link>
           </v-toolbar-title>
         </v-col>
         <v-spacer></v-spacer>
-        <v-col cols="12" sm="6">
-          <div class="mx-2">
-            <div v-if="user" class="d-flex align-center">
-              <span class="ml-auto">{{`Hello, ${user.firstName} ${user.lastName}`}}</span>
-              <v-btn @click="logout" class="ml-5" small color="error">Log-out</v-btn>
+        <v-col cols="12" sm="9" class="d-flex justify-end">
+          <div>
+            <div v-if="user">
+              <span>{{`Hello, ${user.firstName} ${user.lastName}`}}</span>
+              <v-btn @click="logout" class="ml-3" small color="error">Log-out</v-btn>
             </div>
             <v-menu
               v-model="menuAuth"
