@@ -5,7 +5,7 @@
         <v-row justify="center">
           <v-col cols="12" sm="4">
             <div class="d-flex flex-column align-center">
-              <v-img class="mb-4" height="200" width="200" :src="customer.foto"></v-img>
+              <v-img outlined alt="foto" class="mb-4" height="200" width="200" :src="customer.foto"></v-img>
               <v-rating v-model="customer.rating" color="#FFD600" dense half-increments size="20"></v-rating>
             </div>
           </v-col>
@@ -33,12 +33,7 @@
                 required
               ></v-text-field>
               <!--------------------- Proffesion name --------------------------------------->
-              <v-text-field
-                v-model="customer.proffesion"
-                :rules="[rules.required]"
-                label="Proffesion"
-                required
-              ></v-text-field>
+              <v-text-field v-model="customer.proffesion" label="Proffesion" required></v-text-field>
               <!--------------------- Birthday name --------------------------------------->
               <v-menu
                 ref="menu"
@@ -102,28 +97,44 @@ export default {
         return pattern.test(value) || "Invalid e-mail.";
       }
     },
-    menu: false
+    menu: false,
+    newCustomer: false
   }),
 
   methods: {
     saveCustomer() {
-      const { firstName, lastName, email } = this.customer;
-      if (
-        this.rules.required(firstName) == true &&
-        this.rules.required(lastName) == true &&
-        this.rules.required(email) == true &&
-        this.rules.email(email) == true
-      ) {
+      if (this.validData && !this.newCustomer) {
         this.$store.dispatch("editCustomer", this.customer);
+        this.$router.push({ path: "/" });
+      } else if (this.validData && this.newCustomer) {
+        this.$store.dispatch("createCustomer", this.customer);
         this.$router.push({ path: "/" });
       }
     }
   },
 
+  computed: {
+    validData() {
+      const { firstName, lastName, email } = this.customer;
+      return (
+        this.rules.required(firstName) == true &&
+        this.rules.required(lastName) == true &&
+        this.rules.required(email) == true &&
+        this.rules.email(email) == true
+      );
+    }
+  },
+
   mounted: function() {
-    const customer = this.$store.getters.customerData(this.$route.params.id);
-    for (const key in customer) {
-      this.customer[key] = customer[key];
+    const customerId =
+      typeof this.$route.params.id == "string" ? this.$route.params.id : null;
+    if (customerId) {
+      const customer = this.$store.getters.customerData(this.$route.params.id);
+      for (const key in customer) {
+        this.customer[key] = customer[key];
+      }
+    } else {
+      this.newCustomer = true;
     }
   }
 };

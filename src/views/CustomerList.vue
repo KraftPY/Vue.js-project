@@ -26,6 +26,9 @@
             @click:append="sortRating = !sortRating"
           ></v-select>
         </v-col>
+        <v-col v-if="isAuthUser" cols="12" sm="2">
+          <v-btn color="success" @click.prevent="editCustomer">New customer</v-btn>
+        </v-col>
       </v-row>
       <v-row>
         <v-col cols="12" class="d-flex flex-wrap justify-center">
@@ -67,8 +70,18 @@
             </v-list-item>
 
             <v-card-actions class="d-flex justify-end">
-              <v-btn @click.prevent="editCustomer(customer.id)" text color="warning">Edit</v-btn>
-              <v-btn text color="error" @click.prevent="delCustomer(customer.id)">Delete</v-btn>
+              <v-btn
+                :disabled="!isAuthUser"
+                @click.prevent="editCustomer(customer.id)"
+                text
+                color="warning"
+              >Edit</v-btn>
+              <v-btn
+                :disabled="!isAuthUser"
+                text
+                color="error"
+                @click.prevent="delCustomer(customer.id)"
+              >Delete</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -135,6 +148,9 @@ export default {
         customers.sort((a, b) => b.rating - a.rating);
       }
       return customers;
+    },
+    isAuthUser() {
+      return this.$store.getters.isAuthUser;
     }
   }
 };

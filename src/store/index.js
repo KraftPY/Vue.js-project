@@ -17,11 +17,11 @@ export default new Vuex.Store({
         id: 22,
         email: "root@site.com",
         password: "root",
-        firstName: "Bred",
-        lastName: "Fred"
-
+        firstName: "Bredasdasdasd",
+        lastName: "Fredadasdadas"
       }
-    ]
+    ],
+    authUser: null
   },
   mutations: {
     updateCustomers(state, data) {
@@ -36,6 +36,19 @@ export default new Vuex.Store({
       for (const key in oldData) {
         oldData[key] != customer[key] ? oldData[key] = customer[key] : false;
       }
+    },
+
+    addNewCustomers(state, customer) {
+      let newId = 0;
+      do {
+        newId = Math.floor(Math.random() * (1000000000));
+      } while (state.customers.find(el => el.id == newId));
+      customer.id = String(newId);
+      state.customers.push(customer);
+    },
+
+    logout(state) {
+      state.authUser = null;
     }
   },
   actions: {
@@ -66,6 +79,12 @@ export default new Vuex.Store({
 
     editCustomer(ctx, customer) {
       ctx.commit("changeCustomerData", customer);
+    },
+    createCustomer(ctx, customer) {
+      ctx.commit("addNewCustomers", customer);
+    },
+    logoutUser(ctx) {
+      ctx.commit("logout");
     }
   },
   getters: {
@@ -79,7 +98,15 @@ export default new Vuex.Store({
       return state.customers.find(el => el.id == id);
     },
     checkUser: state => user => {
-      return state.users.find(el => (el.email == user.email && el.password == user.password));
+      state.authUser = state.users.find(el => (el.email == user.email && el.password == user.password)) || null;
+      return state.authUser;
+    },
+    isAuthUser(state) {
+      if (state.authUser) {
+        return true;
+      } else {
+        return false;
+      }
     }
   },
   modules: {

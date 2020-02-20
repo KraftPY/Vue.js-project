@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-footer height="100" class="font-weight-medium">
+    <v-footer height="100" class="font-weight-medium ma-0 pa-0">
       <v-col class="text-center" cols="12">{{`Customers - ${customersCount}`}}</v-col>
       <v-col class="text-center" cols="12">
         <strong>
