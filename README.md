@@ -1,24 +1,9 @@
-# app-vue.js
-
-## Project setup
+# Customers base (test SPA project)
+### Technology stack: Vue.js, vuex, vue-router, vuetify, Open-source API (https://randomuser.me/api)
+------
+## Link to view: https://vue-spa-project.herokuapp.com/
 ```
-npm install
+Authorization:
+  e-mail: admin@site.com
+  password: Qaz123
 ```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-
-npm run lint
-
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
